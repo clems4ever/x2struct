@@ -203,6 +203,14 @@ public:
     }
 
     template<typename T>
+    JsonWriter& convert(const char* key, const std::optional<T>& data) {
+        if (data.has_value()) {
+            this->convert(key, *data);
+        }
+        return *this;
+    }
+
+    template<typename T>
     JsonWriter& convert(const char*key, const std::vector<T>&data) {
         x2struct_set_key(key);
         this->array_begin();
