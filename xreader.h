@@ -53,6 +53,34 @@ public:
     XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)), _set_has(false){}
     ~XReader(){}
 public:
+    template <typename T1, typename T2>
+    bool convert(const char*key, std::pair<T1, T2> &val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        size_t s = obj->size();
+        if (s != 2) {
+            return false;
+        }
+
+        T1 value1;
+        auto converted = (*obj)[size_t(0)].convert(NULL, value1);
+        if (!converted) {
+            return false;
+        }
+
+        T2 value2;
+        converted = (*obj)[size_t(1)].convert(NULL, value2);
+        if (!converted) {
+            return false;
+        }
+        val = std::make_pair(value1, value2);
+        return true;
+    }
+
 #if __cplusplus >= 201703L
     template<typename TYPE>
     bool convert(const char*key, std::optional<TYPE> &val) {

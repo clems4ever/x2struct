@@ -202,6 +202,16 @@ public:
         return *this;
     }
 
+    template <typename T1, typename T2>
+    JsonWriter& convert(const char*key, std::pair<T1, T2> p) {
+        x2struct_set_key(key);
+        this->array_begin();
+        this->convert("", p.first);
+        this->convert("", p.second);
+        this->array_end();
+        return *this;
+    }
+
 #if __cplusplus >= 201703L
     template<typename T>
     JsonWriter& convert(const char* key, const std::optional<T>& data) {
