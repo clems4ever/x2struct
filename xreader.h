@@ -53,6 +53,46 @@ public:
     XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)), _set_has(false){}
     ~XReader(){}
 public:
+#if __cplusplus >= 201703L
+    template<typename TYPE>
+    bool convert(const char*key, std::optional<TYPE> &val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        TYPE _value;
+        auto converted = obj->convert(NULL, _value);
+        if (!converted) {
+            return false;
+        }
+        val = std::make_optional(_value);
+        return true;
+    }
+
+    template <typename ...TYPES>
+    bool convert(const char* key, std::tuple<TYPES...>& tuple) {
+        using TUPLE = std::tuple<TYPES...>;
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+        size_t s = obj->size();
+        if (s != std::tuple_size<TUPLE>::value) {
+            return false;
+        }
+
+        return this->convert_tuple(obj, tuple, std::make_index_sequence<std::tuple_size<TUPLE>{}>{});
+    }
+
+    template <typename TUPLE, size_t ...Is>
+    bool convert_tuple(doc_type* obj, TUPLE& tuple, std::index_sequence<Is...>) {
+        return (... && (*obj)[Is].convert(NULL, std::get<Is>(tuple)));
+    }
+#endif
+
     template <typename TYPE>
     bool convert(const char*key, std::vector<TYPE> &val) {
         doc_type tmp;

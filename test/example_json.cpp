@@ -44,4 +44,13 @@ int main(int argc, char *argv[]) {
     vector<int> v;
     X::loadjson(svector, v, false);
     cout<<X::tojson(v)<<endl<<endl;
+
+#if __cplusplus >= 201703L
+    xstruct17 x17;
+
+    // struct <--> string
+    cout<<"======== struct <-----> string ==========="<<endl;
+    X::loadjson("test17.json", x17, true);  // load json from file, if from string, last parameter give false
+    cout<<X::tojson(x17)<<endl<<endl;     // struct to string.
+#endif
 }

@@ -14,6 +14,11 @@ json:
 	./$@
 	@-rm $@
 
+json17:
+	$(GPP) -o $@ example_json.cpp $(INC) -std=c++17
+	./$@
+	@-rm $@
+
 xml:
 	$(GPP) -o $@ example_xml.cpp $(INC)
 	./$@

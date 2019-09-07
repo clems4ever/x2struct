@@ -77,4 +77,15 @@ struct xstruct {
     }
 };
 
+#if __cplusplus >= 201703L
+// Test for C++ 17
+struct xstruct17 {
+    optional<int> iopt;
+    optional<int> inullopt;
+    tuple<int, sub> isubtuple;
+
+    XTOSTRUCT(M(isubtuple, iopt), O(inullopt));
+};
+#endif
+
 #endif

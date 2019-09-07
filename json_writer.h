@@ -202,6 +202,7 @@ public:
         return *this;
     }
 
+#if __cplusplus >= 201703L
     template<typename T>
     JsonWriter& convert(const char* key, const std::optional<T>& data) {
         if (data.has_value()) {
@@ -209,6 +210,16 @@ public:
         }
         return *this;
     }
+
+    template<typename ...Args>
+    JsonWriter& convert(const char* key, const std::tuple<Args...>& data) {
+        x2struct_set_key(key);
+        this->array_begin();
+        this->convert_tuple(data, std::make_index_sequence<std::tuple_size<std::tuple<Args...>>{}>{});
+        this->array_end();
+        return *this;
+    }
+#endif
 
     template<typename T>
     JsonWriter& convert(const char*key, const std::vector<T>&data) {
@@ -282,6 +293,15 @@ public:
     void convert(const char*key, const XType<T>& data) {
         data.__struct_to_str(*this, key);
     }
+
+private:
+#if __cplusplus >= 201703L
+    template <typename Tuple, size_t ...Is>
+    void convert_tuple(const Tuple& tuple, std::index_sequence<Is...>) {
+        // Convert each tuple element.
+        (this->convert("", std::get<Is>(tuple)), ...);
+    }
+#endif
 
 private:
     JSON_WRITER_BUFFER* _buf;
